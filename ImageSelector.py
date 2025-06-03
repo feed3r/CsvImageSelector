@@ -48,7 +48,7 @@ def main():
         with open(csv_file, newline='', encoding='utf-8') as f:
             reader = csv.DictReader(f, delimiter=';')
             photo_names = {
-                row[file_name_column]
+                os.path.basename(row[file_name_column])
                 for row in reader
                 if row[file_name_column]
             }
