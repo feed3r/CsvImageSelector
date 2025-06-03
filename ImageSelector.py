@@ -4,12 +4,18 @@ import shutil
 import tkinter as tk
 from tkinter import filedialog, messagebox, simpledialog
 
+
 # GUI to select files/folders
 def select_csv():
-    return filedialog.askopenfilename(title="Select the CSV file", filetypes=[("CSV files", "*.csv")])
+    return filedialog.askopenfilename(
+        title="Select the CSV file",
+        filetypes=[("CSV files", "*.csv")]
+    )
+
 
 def select_folder(title):
     return filedialog.askdirectory(title=title)
+
 
 def main():
     root = tk.Tk()
@@ -30,15 +36,22 @@ def main():
         messagebox.showerror("Error", "No destination folder selected.")
         return
 
-    file_name_column = simpledialog.askstring("Input", "Enter the name of the column containing the image in the CSV:")
+    file_name_column = simpledialog.askstring(
+        "Input",
+        "Enter the name of the column containing the image in the CSV:"
+    )
     if not file_name_column:
         messagebox.showerror("Error", "No column name provided.")
         return
 
     try:
         with open(csv_file, newline='', encoding='utf-8') as f:
-            reader = csv.DictReader(f)
-            photo_names = {row[file_name_column] for row in reader if row[file_name_column]}
+            reader = csv.DictReader(f, delimiter=';')
+            photo_names = {
+                row[file_name_column]
+                for row in reader
+                if row[file_name_column]
+            }
 
         not_found = []
         copied = 0
@@ -52,10 +65,14 @@ def main():
             else:
                 not_found.append(photo_name)
 
-        messagebox.showinfo("Completed", f"Copied {copied} images.\nNot found: {len(not_found)}")
+        messagebox.showinfo(
+            "Completed",
+            f"Copied {copied} images.\nNot found: {len(not_found)}"
+        )
 
     except Exception as e:
         messagebox.showerror("Error", str(e))
+
 
 if __name__ == "__main__":
     main()
