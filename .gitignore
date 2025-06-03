@@ -5,3 +5,8 @@
 dist/
 build/
 
+# Ignore Python cache directories
+__pycache__/
+*.pyc
+*.pyo
+
