@@ -70,6 +70,20 @@ def main():
             f"Copied {copied} images.\nNot found: {len(not_found)}"
         )
 
+        if not_found:
+            not_found_window = tk.Toplevel(root)
+            not_found_window.title("Not Found Images")
+
+            scrollbar = tk.Scrollbar(not_found_window)
+            scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+
+            listbox = tk.Listbox(not_found_window, yscrollcommand=scrollbar.set)
+            for image in not_found:
+                listbox.insert(tk.END, image)
+            listbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+
+            scrollbar.config(command=listbox.yview)
+
     except Exception as e:
         messagebox.showerror("Error", str(e))
 
