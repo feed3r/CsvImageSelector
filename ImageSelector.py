@@ -95,18 +95,38 @@ def main():
         )
 
         if not_found:
+            # Crea una finestra figlia
             not_found_window = tk.Toplevel(root)
-            not_found_window.title("Not Found Images")
+            not_found_window.title("Images Not Found")
+            not_found_window.geometry("500x400")
 
-            scrollbar = tk.Scrollbar(not_found_window)
+            label = tk.Label(not_found_window, text="The following images were not found:", font=("Arial", 12))
+            label.pack(pady=10)
+
+            frame = tk.Frame(not_found_window)
+            frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+
+            scrollbar = tk.Scrollbar(frame)
             scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
 
-            listbox = tk.Listbox(not_found_window, yscrollcommand=scrollbar.set)
+            listbox = tk.Listbox(frame, yscrollcommand=scrollbar.set, width=60)
             for image in not_found:
                 listbox.insert(tk.END, image)
             listbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
 
             scrollbar.config(command=listbox.yview)
+
+            # Aggiungi un pulsante per chiudere
+            close_button = tk.Button(not_found_window, text="Close", command=not_found_window.destroy)
+            close_button.pack(pady=10)
+
+            # Rendi modale la finestra
+            not_found_window.transient(root)
+            not_found_window.grab_set()
+            root.deiconify()  # Assicura che root sia "vivo"
+            root.wait_window(not_found_window)
+
+
 
     except KeyError as e:
         messagebox.showerror("Error", f"Column '{file_name_column}' not found in CSV: {e}")
