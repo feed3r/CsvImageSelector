@@ -17,6 +17,17 @@ def select_folder(title):
     return filedialog.askdirectory(title=title)
 
 
+def detect_delimiter(sample_line):
+    if '\t' in sample_line:
+        return '\t'
+    elif ';' in sample_line:
+        return ';'
+    elif ',' in sample_line:
+        return ','
+    else:
+        return ','  # fallback
+
+
 def main():
     root = tk.Tk()
     root.withdraw()  # Hides the main window
@@ -46,11 +57,24 @@ def main():
 
     try:
         with open(csv_file, newline='', encoding='utf-8') as f:
-            reader = csv.DictReader(f, delimiter=';')
+            
+            first_line = f.readline()
+            f.seek(0)  # torna all'inizio del file
+            delimiter = detect_delimiter(first_line)
+            reader = csv.DictReader(f, delimiter=delimiter)
+            
+            # Case-insensitive header matching
+            header_map = {col.lower(): col for col in reader.fieldnames}
+            requested_col = file_name_column.strip().lower()
+            if requested_col not in header_map:
+                messagebox.showerror("Error", f"Column '{file_name_column}' not found in CSV.")
+                return
+            actual_column = header_map[requested_col]
+
             photo_names = {
-                os.path.basename(row[file_name_column])
+                os.path.basename(row[actual_column])
                 for row in reader
-                if row[file_name_column]
+                if row.get(actual_column)
             }
 
         not_found = []
@@ -84,6 +108,8 @@ def main():
 
             scrollbar.config(command=listbox.yview)
 
+    except KeyError as e:
+        messagebox.showerror("Error", f"Column '{file_name_column}' not found in CSV: {e}")
     except Exception as e:
         messagebox.showerror("Error", str(e))
 
