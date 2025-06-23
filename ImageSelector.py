@@ -95,38 +95,50 @@ def main():
         )
 
         if not_found:
-            # Crea una finestra figlia
             not_found_window = tk.Toplevel(root)
             not_found_window.title("Images Not Found")
-            not_found_window.geometry("500x400")
+            not_found_window.geometry("600x400")
+            
+            max_lines = min(len(not_found), 40)  # fino a 40 righe visibili
+            line_height = 20
+            height = max_lines * line_height + 100
+            not_found_window.geometry(f"800x{height}")
+            not_found_window.minsize(500, 300)
 
+            # Intestazione
             label = tk.Label(not_found_window, text="The following images were not found:", font=("Arial", 12))
-            label.pack(pady=10)
+            label.pack(pady=(10, 0))
 
+            # Contenitore principale per testo + scrollbar
             frame = tk.Frame(not_found_window)
             frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
 
+            # Scrollbar verticale
             scrollbar = tk.Scrollbar(frame)
             scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
 
-            listbox = tk.Listbox(frame, yscrollcommand=scrollbar.set, width=60)
+            # Testo selezionabile
+            text_widget = tk.Text(frame, wrap=tk.NONE, yscrollcommand=scrollbar.set)
+            text_widget.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+
+            scrollbar.config(command=text_widget.yview)
+
+            # Inserisci testo
             for image in not_found:
-                listbox.insert(tk.END, image)
-            listbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+                text_widget.insert(tk.END, image + "\n")
+            text_widget.config(state=tk.DISABLED)
 
-            scrollbar.config(command=listbox.yview)
-
-            # Aggiungi un pulsante per chiudere
+            # Pulsante "Close"
             close_button = tk.Button(not_found_window, text="Close", command=not_found_window.destroy)
-            close_button.pack(pady=10)
+            close_button.pack(pady=(0, 10))
 
-            # Rendi modale la finestra
+            # Modalità modale
             not_found_window.transient(root)
             not_found_window.grab_set()
-            root.deiconify()  # Assicura che root sia "vivo"
+            root.deiconify()
             root.wait_window(not_found_window)
 
-
+        root.destroy()
 
     except KeyError as e:
         messagebox.showerror("Error", f"Column '{file_name_column}' not found in CSV: {e}")
